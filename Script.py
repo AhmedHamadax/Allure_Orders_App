@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import os
+import io
 
 # Function to run the script
 def run_script(makhzan_file, new_orders_file):
@@ -64,18 +64,13 @@ def run_script(makhzan_file, new_orders_file):
 
         idx += 1
 
-    # Save the final DataFrame to Excel
-    if 'Allure_Updated_values.xlsx' in os.listdir():
-        os.remove('Allure_Updated_values.xlsx')
-        sys.to_excel('Allure_Updated_values.xlsx', index=False)
-    else:
-        sys.to_excel('Allure_Updated_values.xlsx', index=False)
-
-    # Show success or error message
+    # Streamlit UI to show success or error message
     if error == 1:
         st.error(f"undefined word found: ({error_word} for {error_names} orders)")
     else:
         st.success(f"{number_of_orders} orders successfully assigned")
+    
+    return sys
 
 # Streamlit UI setup
 st.title("Allure Orders Generator")
@@ -87,8 +82,19 @@ new_orders_file = st.file_uploader("Upload New Orders Excel File", type=["xlsx"]
 
 # Button to trigger the script if files are uploaded
 if st.button("Run Script") and makhzan_file is not None and new_orders_file is not None:
-    run_script(makhzan_file, new_orders_file)
+    final_df = run_script(makhzan_file, new_orders_file)
+    
+    # Convert the final dataframe to a BytesIO object to enable download
+    if final_df is not None:
+        # Convert the DataFrame to Excel and then to BytesIO
+        output = io.BytesIO()
+        final_df.to_excel(output, index=False)
+        output.seek(0)
 
-# Optionally, clear session state after running if needed
-if 'error' in st.session_state:
-    del st.session_state['error']
+        # Provide a download button for the user
+        st.download_button(
+            label="Download Updated Excel File",
+            data=output,
+            file_name="Allure_Updated_values.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
