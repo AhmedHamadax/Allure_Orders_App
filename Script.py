@@ -5,56 +5,54 @@ import io
 
 # Function to run the script
 def run_script(makhzan_file, new_orders_file):
+    # Read fresh copies of the uploaded Excel files
+    sys = pd.read_excel(makhzan_file).copy()
+    fullfill = pd.read_excel(new_orders_file).copy()
+    
+    # Reset variables for a clean state
     error_word = []
     error_names = []
     number_of_orders = 0
     error = 0
-    # Read the uploaded Excel files
-    sys = pd.read_excel(makhzan_file)
-    fullfill = pd.read_excel(new_orders_file)
-    
     idx = 3
     step = 0
-    
+
     # Loop through each order and process
     for code, name in zip((fullfill['Packages'][3:].astype(str)), (fullfill['Unnamed: 13'][3:].astype(str))):
         if code == 'nan':
             break
         order = fullfill.iloc[idx]['Unnamed: 35']
-        order_splitted = (order.split(' '))
-        count1 = order_splitted[0]
-        product1 = order_splitted[2]
+        order_splitted = order.split(' ')
+        
+        count1, product1 = order_splitted[0], order_splitted[2]
+        count2, product2, count3, product3 = 0, '', 0, ''
+        
         try:
-            count2 = order_splitted[3]
-            product2 = order_splitted[5]
-        except:
-            count2 = 0
-            product2 = ''
+            count2, product2 = order_splitted[3], order_splitted[5]
+        except IndexError:
+            pass
         try:
-            count3 = order_splitted[6]
-            product3 = order_splitted[8]
-        except:
-            product3 = ''
-            count3 = 0
-        all_products = [prod for prod in [product1, product2, product3] if (prod != '')]
-        all_counts = [c for c in [count1, count2, count3] if (c != 0)]
+            count3, product3 = order_splitted[6], order_splitted[8]
+        except IndexError:
+            pass
+
+        all_products = [prod for prod in [product1, product2, product3] if prod]
+        all_counts = [c for c in [count1, count2, count3] if c]
+
         sys.loc[idx - 3 + step, 'TN'] = code
-        number_of_orders += 1
         sys.loc[idx - 3 + step, 'CST Name'] = name
+        number_of_orders += 1
 
         # Update SKU and Quantity based on product type
         for c, prod in zip(all_counts, all_products):
-            if prod == 'بشرة':
-                sys.loc[idx - 3 + step, 'SKU'] = 'Allure15948'
-                sys.loc[idx - 3 + step, 'Quantity'] = c
-            elif prod == 'عين':
-                sys.loc[idx - 3 + step, 'SKU'] = 'Allure12345'
-                sys.loc[idx - 3 + step, 'Quantity'] = c
-            elif prod == 'شعر':
-                sys.loc[idx - 3 + step, 'SKU'] = 'Allure67890'
-                sys.loc[idx - 3 + step, 'Quantity'] = c
-            elif prod == 'اسكرين':
-                sys.loc[idx - 3 + step, 'SKU'] = 'Allure35724'
+            sku_map = {
+                'بشرة': 'Allure15948',
+                'عين': 'Allure12345',
+                'شعر': 'Allure67890',
+                'اسكرين': 'Allure35724'
+            }
+            if prod in sku_map:
+                sys.loc[idx - 3 + step, 'SKU'] = sku_map[prod]
                 sys.loc[idx - 3 + step, 'Quantity'] = c
             else:
                 error_word.append(prod)
@@ -66,10 +64,10 @@ def run_script(makhzan_file, new_orders_file):
 
     # Streamlit UI to show success or error message
     if error == 1:
-        st.error(f"undefined word found: ({error_word} for {error_names} orders)")
+        st.error(f"Undefined words found: {error_word} for {error_names} orders")
     else:
         st.success(f"{number_of_orders} orders successfully assigned")
-    
+
     return sys
 
 # Streamlit UI setup
@@ -83,8 +81,7 @@ new_orders_file = st.file_uploader("Upload New Orders Excel File", type=["xlsx"]
 # Button to trigger the script if files are uploaded
 if st.button("Run Script") and makhzan_file is not None and new_orders_file is not None:
     final_df = run_script(makhzan_file, new_orders_file)
-    
-    # Convert the final dataframe to a BytesIO object to enable download
+
     if final_df is not None:
         # Convert the DataFrame to Excel and then to BytesIO
         output = io.BytesIO()
