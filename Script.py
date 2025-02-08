@@ -22,7 +22,7 @@ def run_script(makhzan_file, new_orders_file):
     for code, name in zip((fullfill['BareCode'].astype(str)), (fullfill['Customer Name'].astype(str))):
         if code == 'nan':
             break
-        order = fullfill.iloc[idx]['Description']
+        order = fullfill.iloc[idx][' Description']
         order_code=fullfill.iloc[idx]['']
         order_splitted = order.split(' ')
         
