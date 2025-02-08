@@ -40,8 +40,8 @@ def run_script(makhzan_file, new_orders_file):
         all_products = [prod for prod in [product1, product2, product3] if prod]
         all_counts = [c for c in [count1, count2, count3] if c]
 
-        sys.loc[idx - 3 + step, 'TN'] = code
-        sys.loc[idx - 3 + step, 'CST Name'] = name
+        # sys.loc[idx - 3 + step, 'TN'] = code
+        # sys.loc[idx - 3 + step, 'CST Name'] = name
         number_of_orders += 1
 
         # Update SKU and Quantity based on product type
@@ -53,9 +53,10 @@ def run_script(makhzan_file, new_orders_file):
                 'اسكرين': 'Allure35724'
             }
             if prod in sku_map:
-                sys.loc[idx - 3 + step, 'SKU'] = sku_map[prod]
-                sys.loc[idx - 3 + step, 'Quantity'] = c
-                sys.loc[idx - 3 + step, 'TN'] = 
+                sys.loc[idx + step, 'SKU'] = sku_map[prod]
+                sys.loc[idx + step, 'Quantity'] = c
+                sys.loc[idx + step, 'TN'] = code
+                sys.loc[idx + step, 'CST Name'] = name
             else:
                 error_word.append(prod)
                 error_names.append(name)
