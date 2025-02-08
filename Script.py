@@ -7,21 +7,22 @@ import io
 def run_script(makhzan_file, new_orders_file):
     # Read fresh copies of the uploaded Excel files
     sys = pd.read_excel(makhzan_file).copy()
-    fullfill = pd.read_excel(new_orders_file).copy()
+    fullfill = pd.read_excel(new_orders_file,header=3).copy()
     
     # Reset variables for a clean state
     error_word = []
     error_names = []
     number_of_orders = 0
     error = 0
-    idx = 3
+    idx = 0
     step = 0
 
     # Loop through each order and process
-    for code, name in zip((fullfill['Packages'][3:].astype(str)), (fullfill['Unnamed: 13'][3:].astype(str))):
+    for code, name in zip((fullfill['Packages'].astype(str)), (fullfill['Customer Name'].astype(str))):
         if code == 'nan':
             break
-        order = fullfill.iloc[idx]['Unnamed: 31']
+        order = fullfill.iloc[idx]['Description']
+        order_code=fullfill.iloc[idx]['']
         order_splitted = order.split(' ')
         
         count1, product1 = order_splitted[0], order_splitted[2]
@@ -54,6 +55,7 @@ def run_script(makhzan_file, new_orders_file):
             if prod in sku_map:
                 sys.loc[idx - 3 + step, 'SKU'] = sku_map[prod]
                 sys.loc[idx - 3 + step, 'Quantity'] = c
+                sys.loc[idx - 3 + step, 'TN'] = 
             else:
                 error_word.append(prod)
                 error_names.append(name)
