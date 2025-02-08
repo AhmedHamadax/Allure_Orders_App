@@ -21,7 +21,7 @@ def run_script(makhzan_file, new_orders_file):
     for code, name in zip((fullfill['Packages'][3:].astype(str)), (fullfill['Unnamed: 13'][3:].astype(str))):
         if code == 'nan':
             break
-        order = fullfill.iloc[idx]['Unnamed: 35']
+        order = fullfill.iloc[idx]['Unnamed: 31']
         order_splitted = order.split(' ')
         
         count1, product1 = order_splitted[0], order_splitted[2]
