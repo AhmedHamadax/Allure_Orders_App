@@ -23,7 +23,6 @@ def run_script(makhzan_file, new_orders_file):
         if code == 'nan':
             break
         order = fullfill.iloc[idx][' Description']
-        order_code=fullfill.iloc[idx]['']
         order_splitted = order.split(' ')
         
         count1, product1 = order_splitted[0], order_splitted[2]
