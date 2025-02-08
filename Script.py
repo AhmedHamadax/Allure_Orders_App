@@ -18,6 +18,7 @@ def run_script(makhzan_file, new_orders_file):
     step = 0
 
     # Loop through each order and process
+    print(fulfill.columns)
     for code, name in zip((fullfill['BareCode'].astype(str)), (fullfill['Customer Name'].astype(str))):
         if code == 'nan':
             break
