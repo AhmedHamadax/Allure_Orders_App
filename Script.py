@@ -25,14 +25,15 @@ def run_script(makhzan_file, new_orders_file):
         order = fullfill.iloc[idx][' Description']
         order_splitted = order.split(' ')
         
-        count1, product1 = order_splitted[0], order_splitted[1]
+        count1, product1 = order_splitted[0], order_splitted[2]
         count2, product2, count3, product3 = 0, '', 0, ''
+        
         try:
-            count2, product2 = order_splitted[3], order_splitted[4]
+            count2, product2 = order_splitted[3], order_splitted[5]
         except IndexError:
             pass
         try:
-            count3, product3 = order_splitted[6], order_splitted[7]
+            count3, product3 = order_splitted[6], order_splitted[8]
         except IndexError:
             pass
 
@@ -46,10 +47,10 @@ def run_script(makhzan_file, new_orders_file):
         # Update SKU and Quantity based on product type
         for c, prod in zip(all_counts, all_products):
             sku_map = {
-                'Face': 'Allure15948',
-                'Eye': 'Allure12345',
-                'Hair': 'Allure67890',
-                'Sun': 'Allure35724'
+                'بشرة': 'Allure15948',
+                'عين': 'Allure12345',
+                'شعر': 'Allure67890',
+                'اسكرين': 'Allure35724'
             }
             if prod in sku_map:
                 sys.loc[idx + step, 'SKU'] = sku_map[prod]
